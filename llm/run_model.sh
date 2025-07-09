@@ -9,6 +9,7 @@ sleep 5
 
 if ! ollama list | grep -q "^${MODEL_NAME}"; then
     ollama create ${MODEL_NAME} -f $(dirname "$0")/Modelfile
+    ollama run  ${MODEL_NAME}
 fi
 
 echo "Sleeping"

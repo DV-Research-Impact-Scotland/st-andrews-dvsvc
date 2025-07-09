@@ -110,7 +110,7 @@ class RegexPredicate(Predicate):
         return (
             self.__class__.__name__
             + "("
-            + " ".join([f"{{{next(iter(p))} ... }}" for p in self.patterns])
+            + " ".join([f"{{{p} ... }}" for p in self.patterns])
             + ")"
         )
 

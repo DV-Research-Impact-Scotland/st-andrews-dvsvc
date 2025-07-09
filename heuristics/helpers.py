@@ -8,7 +8,7 @@ def read_csv_as_dict(csv_file) -> dict[str, list[str]]:
     """
     data = {}
 
-    with open(csv_file, "r") as file:
+    with open(csv_file, "r", encoding="utf8") as file:
         reader = csv.reader(file)
         for row in reader:
             key = row[0]
