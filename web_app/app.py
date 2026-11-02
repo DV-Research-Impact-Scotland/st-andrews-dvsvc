@@ -63,7 +63,7 @@ def all_charity_list(page, location="location", distance="distance", current_dis
     page = int(page)
     # list all charities within given range for that page, calculated from current length and the page limit (number of charities per page)
     for c in charity_list[(page-1)*PAGE_LIMIT: (page)*PAGE_LIMIT]:
-        outstr = outstr + f"""<li onclick="location.href='{url_for('charity_page',index=c[0])}';", style="outline: thick inset"><div >
+        outstr = outstr + f"""<li onclick="location.href='{url_for('charity_page',index=c[0])}';", class="card"><div >
         <h3>{c[1]}</h3>
         <a href='{c[2]}'> {c[2]} </a>
         <br>
@@ -96,7 +96,7 @@ def search_charity_list(page, location, distance, current_dist):
     page = int(page)
     # list all charities within given range for that page, calculated from current length and the page limit (number of charities per page)
     for c in charity_list[(page-1)*PAGE_LIMIT: (page)*PAGE_LIMIT]:
-        outstr = outstr + f"""<li onclick="location.href='{url_for('charity_page',index=c[0])}';", style="outline: thick inset"><div >
+        outstr = outstr + f"""<li onclick="location.href='{url_for('charity_page',index=c[0])}';", class="card"><div >
                 <h3>{c[1]}</h3>
                 <a href='{c[3]}'> {c[3]} </a>
                 <br>
@@ -164,7 +164,7 @@ def charity_page(index):
     for s in service_info:
         service_details = service_details + f"""
                 <li>
-                <div style="outline: thick inset">
+                <div class="card">
                     description: {s[1]}
                     <br>
                     <br>
