@@ -66,10 +66,10 @@ function addCharitiesToMap(data){
                 <a href='${d.url}' class="popup-link"> ${d.url} </a>
                 <br>
                 <br>
-                location: ${d.location_name}
+                ${d.location_name}
                 <br>
                 <br>
-                summary: ${d.summary}
+                ${d.summary}
                 <br>
 
                 </div>`)

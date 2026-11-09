@@ -68,7 +68,7 @@ def all_charity_list(page, location="location", distance="distance", current_dis
         <a href='{c[2]}'> {c[2]} </a>
         <br>
         <br>
-        summary: {c[3]}
+        {c[3]}
         <br>
 
         </div></li>"""
@@ -101,10 +101,10 @@ def search_charity_list(page, location, distance, current_dist):
                 <a href='{c[3]}'> {c[3]} </a>
                 <br>
                 <br>
-                location: {c[2]}, distance: {(c[5]/1000):.2f}
+                {c[2]}, {(c[5]/1000):.2f}km away
                 <br>
                 <br>
-                summary: {c[4]}
+                {c[4]}
                 <br>
 
                 </div></li>"""
@@ -165,14 +165,14 @@ def charity_page(index):
         service_details = service_details + f"""
                 <li>
                 <div class="card">
-                    description: {s[1]}
+                    {s[1]}
                     <br>
                     <br>
-                    locations: {s[4]}
+                    {",".join(s[4])}
                     <br>
-                    phone numbers: {s[2]}
+                    {",".join(s[2])}
                     <br>
-                    emails: {s[3]}
+                    {",".join(s[3])}
                     <br>
                     <br>
                 </div>
