@@ -58,15 +58,17 @@ function addCharitiesToMap(data){
     let charityMarkers = L.markerClusterGroup();
     for (let d of data) {
         // need to sort data for new filter - not in JSON format
+        console.log(d)
         if (d.latitude && d.longitude) {
             let m = new L.CircleMarker([d.latitude, d.longitude], {radius:25, color:"#FF0000", fillColor:"#FF0000"})
             charityMarkers.addLayer(m)
+            let dist = "distance" in d ? `<br> ${(d.distance/1000).toFixed(2)}km away`: ''
             m.bindPopup(`<div onclick="location.href='${SCRIPT_ROOT}/charity/${d.charity_id}';" style="cursor: pointer;">
                 <h3>${d.charity_name}</h3>
                 <a href='${d.url}' class="popup-link"> ${d.url} </a>
                 <br>
                 <br>
-                ${d.location_name}
+                ${d.location_name} ${dist}
                 <br>
                 <br>
                 ${d.summary}
