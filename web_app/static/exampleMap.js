@@ -1,3 +1,8 @@
+var map = L.map('map').setView([51.505, -0.09], 13);
+var currentMarkerGroup = L.featureGroup()
+currentMarkerGroup.addTo(map)
+var charitiesToShow = []
+
 const form = document.querySelector("#locinfo");
 
 async function sendLocation() {
@@ -8,15 +13,17 @@ async function sendLocation() {
     const response = fetch(`${SCRIPT_ROOT}/mapApi/loc`, {
       method: "POST",
       body: formData,
-    }).then(resp => resp.json()).then(d => {console.log(d); charitiesToShow = d; addCharitiesToMap(d); })
-    const searchLoc = fetch(`${SCRIPT_ROOT}/convert/${formData.get("loc")}`).then(resp => resp.json()).then(d => {
-      console.log(d); 
+    }).then(resp => resp.json()).then(d => {console.log(d); charitiesToShow = d; addCharitiesToMap(d); fetch(`${SCRIPT_ROOT}/convert/${formData.get("loc")}`).then(resp => resp.json()).then(d => {
       currentMarkerGroup.addLayer(L.marker([d[1], d[2]]));
       const boundary = new L.Circle([d[1], d[2]], {radius: formData.get("dist")*1000, color:"#0000FF", fillOpacity:0.01 });
       currentMarkerGroup.addLayer(boundary)
       boundary.bringToBack()
-      map.setView([d[1], d[2]])
-    });
+      console.log(currentMarkerGroup.getBounds())
+      map.flyToBounds(currentMarkerGroup.getBounds())
+      console.log("flew")
+    }); })
+    
+    
   } catch (e) {
     console.error(e);
   }
@@ -27,10 +34,7 @@ form.addEventListener("submit", (event) => {
   sendLocation();
 });
 
-var map = L.map('map').setView([51.505, -0.09], 13);
-var currentMarkerGroup = L.layerGroup()
-currentMarkerGroup.addTo(map)
-var charitiesToShow = []
+
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
