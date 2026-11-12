@@ -10,7 +10,8 @@ PAGE_LIMIT = 10
 app = Flask(__name__)
 geolocator = Nominatim(user_agent=USER_AGENT)
 geocode = RateLimiter(geolocator.geocode, min_delay_seconds=DELAY)
-print("finds file")
+
+
 """
 Retrieves coordinates of a given string location/postcode
 """
@@ -182,14 +183,17 @@ def charity_page(index):
     page = page + charity_details + service_details+"</ul> </body>"
     return page
 
+""" Show map view """
 @app.route("/map", methods = ['POST', 'GET'])
 def map_view():
     return render_template("map.html")
 
+"""Returns list of all charitys for map view"""
 @app.route("/mapApi/all",  methods = ['GET'])
 def get_all_charity_info():
     return list(map(lambda x: {"charity_id": x[0], "charity_name": x[1], "location_name": x[2], "latitude": x[3], "longitude": x[4], "url": x[5], "summary": x[6]},  queries.get_all_locations()))
 
+"""Returns list of charities within search radius from form"""
 @app.route("/mapApi/loc", methods = ['POST', 'GET'])
 def get_filtered_locations():
     if request.method == "POST":
