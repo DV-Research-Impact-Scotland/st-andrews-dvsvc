@@ -1,6 +1,7 @@
 <head><link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
+<a href="{{ url_for('map_view')}}"><button>Map View</button></a>
 <h1> Enter Location</h1>
 <form method="post", action="{{url_for('location_filter')}}">
        Postcode:
