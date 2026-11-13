@@ -51,7 +51,7 @@ def location_filter():
         else:
            return redirect(url_for("search_charity_list",location = current_loc, distance=original_dist, current_dist = current_dist, page=1))
 
-    return render_template("index.html", loc="Postcode", dist="distance")
+    return render_template("index.html", loc="Postcode", dist="Distance")
 
 
 """ Paginates all uk search. Access separately, or through search"""
@@ -184,9 +184,9 @@ def charity_page(index):
     return page
 
 """ Show map view """
-@app.route("/map", methods = ['POST', 'GET'])
-def map_view():
-    return render_template("map.html")
+@app.route("/map/<location>/<distance>", methods = ['POST', 'GET'])
+def map_view(location="Postcode", distance="Distance"):
+    return render_template("map.html", loc=location, dist=distance)
 
 """Returns list of all charitys for map view"""
 @app.route("/mapApi/all",  methods = ['GET'])
