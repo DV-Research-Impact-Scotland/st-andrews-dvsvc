@@ -11,18 +11,20 @@ app = Flask(__name__)
 geolocator = Nominatim(user_agent=USER_AGENT)
 geocode = RateLimiter(geolocator.geocode, min_delay_seconds=DELAY)
 
+
 """
 Retrieves coordinates of a given string location/postcode
 """
+@app.route("/convert/<location>", methods = ["GET"])
 def get_coordinates(location: str):
     try:
       conv = geocode(f"{location}, UK", exactly_one=True)
       if conv is not None:
-         return conv.address, conv.latitude, conv.longitude
-      return None, None, None
+         return [conv.address, conv.latitude, conv.longitude]
+      return [None, None, None]
     except Exception as e:
       print(f"Error: {e}")
-      return None, None, None
+      return [None, None, None]
 
 """
 Takes in postcode and distance from form, and obtains list of charities in that distance, or nearest reasonable distance
@@ -49,7 +51,7 @@ def location_filter():
         else:
            return redirect(url_for("search_charity_list",location = current_loc, distance=original_dist, current_dist = current_dist, page=1))
 
-    return render_template("index.html", loc="Postcode", dist="distance")
+    return render_template("index.html", loc="Postcode", dist="Distance")
 
 
 """ Paginates all uk search. Access separately, or through search"""
@@ -62,12 +64,12 @@ def all_charity_list(page, location="location", distance="distance", current_dis
     page = int(page)
     # list all charities within given range for that page, calculated from current length and the page limit (number of charities per page)
     for c in charity_list[(page-1)*PAGE_LIMIT: (page)*PAGE_LIMIT]:
-        outstr = outstr + f"""<li onclick="location.href='{url_for('charity_page',index=c[0])}';", style="outline: thick inset"><div >
+        outstr = outstr + f"""<li onclick="location.href='{url_for('charity_page',index=c[0])}';", class="card"><div >
         <h3>{c[1]}</h3>
         <a href='{c[2]}'> {c[2]} </a>
         <br>
         <br>
-        summary: {c[3]}
+        {c[3]}
         <br>
 
         </div></li>"""
@@ -95,15 +97,15 @@ def search_charity_list(page, location, distance, current_dist):
     page = int(page)
     # list all charities within given range for that page, calculated from current length and the page limit (number of charities per page)
     for c in charity_list[(page-1)*PAGE_LIMIT: (page)*PAGE_LIMIT]:
-        outstr = outstr + f"""<li onclick="location.href='{url_for('charity_page',index=c[0])}';", style="outline: thick inset"><div >
+        outstr = outstr + f"""<li onclick="location.href='{url_for('charity_page',index=c[0])}';", class="card"><div >
                 <h3>{c[1]}</h3>
                 <a href='{c[3]}'> {c[3]} </a>
                 <br>
                 <br>
-                location: {c[2]}, distance: {(c[5]/1000):.2f}
+                {c[2]}, {(c[5]/1000):.2f}km away
                 <br>
                 <br>
-                summary: {c[4]}
+                {c[4]}
                 <br>
 
                 </div></li>"""
@@ -131,7 +133,7 @@ def page_links(num_pages, curr_page, redirect, location, distance, current_dist)
 
 
 """
-Information about charity with that index number deisplayed in own page
+Information about charity with that index number displayed in own page
 """
 @app.route("/charity/<index>")
 def charity_page(index):
@@ -163,15 +165,15 @@ def charity_page(index):
     for s in service_info:
         service_details = service_details + f"""
                 <li>
-                <div style="outline: thick inset">
-                    description: {s[1]}
+                <div class="card">
+                    {s[1]}
                     <br>
                     <br>
-                    locations: {s[4]}
+                    {",".join(s[4])}
                     <br>
-                    phone numbers: {s[2]}
+                    {",".join(s[2])}
                     <br>
-                    emails: {s[3]}
+                    {",".join(s[3])}
                     <br>
                     <br>
                 </div>
@@ -180,3 +182,32 @@ def charity_page(index):
         """
     page = page + charity_details + service_details+"</ul> </body>"
     return page
+
+""" Show map view """
+@app.route("/map/<location>/<distance>", methods = ['POST', 'GET'])
+def map_view(location="Postcode", distance="Distance"):
+    return render_template("map.html", loc=location, dist=distance)
+
+"""Returns list of all charitys for map view"""
+@app.route("/mapApi/all",  methods = ['GET'])
+def get_all_charity_info():
+    return list(map(lambda x: {"charity_id": x[0], "charity_name": x[1], "location_name": x[2], "latitude": x[3], "longitude": x[4], "url": x[5], "summary": x[6]},  queries.get_all_locations()))
+
+"""Returns list of charities within search radius from form"""
+@app.route("/mapApi/loc", methods = ['POST', 'GET'])
+def get_filtered_locations():
+    if request.method == "POST":
+        current_loc = request.form["loc"]
+        current_dist = int(request.form["dist"])
+        original_dist = current_dist
+        address, lat, long = get_coordinates(current_loc)
+        if address is None:
+            nearby = []
+        else:
+            nearby = queries.get_locations(lat, long, int(current_dist))
+            # expand until either item found or length of UK covered 
+            while nearby == [] and current_dist < UK_LENGTH:
+                nearby = queries.get_locations(lat, long, int(current_dist))
+                current_dist = current_dist + 50
+        
+        return list(map(lambda x: {"charity_id": x[0], "charity_name": x[1], "location_name": x[2],  "url": x[3], "summary": x[4], "distance": x[5], "latitude": x[6], "longitude": x[7]},  nearby))
